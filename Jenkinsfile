@@ -35,6 +35,7 @@ pipeline {
           try {
             anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
           } catch (err) {
+            // if scan fails, clean up (delete the image) and fail the build
             sh 'docker rmi $repository$tag'
             sh 'exit 1'
           }
@@ -55,7 +56,7 @@ pipeline {
     stage('Clean up') {
       // if we succuessfully pushed the :prod tag than we don't need the $BUILD_ID tag anymore
       steps {
-        sh 'docker rmi $repository$tag'
+        sh 'docker rmi $repository$tag $repository:prod'
       }
     }
   }
