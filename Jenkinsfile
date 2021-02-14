@@ -31,10 +31,13 @@ pipeline {
     stage('Analyze with Anchore plugin') {
       steps {
         writeFile file: 'anchore_images', text: imageLine
-        catchError {
-          anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
+        script {
+          try {
+            anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
+          } catch (err) {
+            sh 'docker rmi $repository$tag'
+          }
         }
-        sh 'docker rmi $repository$tag'
         // forceAnalyze is required since we're passing a Dockerfile with the image
       }
     }
