@@ -7,10 +7,11 @@ pipeline {
     // you need a credential named 'docker-hub' with your DockerID/password to push images
     registryCredential = 'docker-hub'
     // change this repository and imageLine to your DockerID
-    repository = 'pvnovarese/jenkins-plugin-bug'
+    //repository = 'pvnovarese/jenkins-plugin-bug'
+    repository = "pvnovarese/anchore-jenkins-pipeline-demo"
     //tag = ":testcase1-${BUILD_NUMBER}"
-    tag = ":testcase8-b77"
-    imageLine = "pvnovarese/jenkins-plugin-bug:testcase8-b77 Dockerfile"
+    tag = ":testcase1-b49"
+    imageLine = "pvnovarese/anchore-jenkins-pipeline-demo:testcase1-b49 Dockerfile"
   }
   agent any
   stages {
@@ -49,7 +50,7 @@ pipeline {
     stage('Clean up') {
       // if we succuessfully pushed the :prod tag than we don't need the $BUILD_ID tag anymore
       steps {
-        sh 'docker rmi $repository:testcase8-b77'
+        sh 'docker rmi $repository$tag'
       }
     }
   }
