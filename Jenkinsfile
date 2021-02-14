@@ -33,6 +33,7 @@ pipeline {
         writeFile file: 'anchore_images', text: IMAGELINE
         script {
           try {
+            // forceAnalyze is a good idea since we're passing a Dockerfile with the image
             anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
           } catch (err) {
             // if scan fails, clean up (delete the image) and fail the build
@@ -40,7 +41,6 @@ pipeline {
             sh 'exit 1'
           }
         }
-        // forceAnalyze is required since we're passing a Dockerfile with the image
       }
     }
     stage('Re-tag as prod and push stable image to registry') {
@@ -54,7 +54,7 @@ pipeline {
       }
     }
     stage('Clean up') {
-      // if we succuessfully pushed the :prod tag than we don't need the $BUILD_ID tag anymore
+      // get rid of both the pre-scan tag and prod tag
       steps {
         sh 'docker rmi ${REPOSITORY}${TAG} ${REPOSITORY}:prod'
       }
