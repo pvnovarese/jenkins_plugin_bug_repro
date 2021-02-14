@@ -6,10 +6,10 @@ pipeline {
     // registry = 'registry.hub.docker.com'
     // you need a credential named 'docker-hub' with your DockerID/password to push images
     registryCredential = "docker-hub"
-    DockerHub = credentials(${registryCredential})
-    repository = "${DockerHub_USR}/jenkins-plugin-bug"
-    tag = ":testcase1-${BUILD_NUMBER}"
-    imageLine = "${repository}${tag} Dockerfile"
+    DOCKER_HUB = credentials("$registryCredential")
+    REPOSITORY = "${DOCKER_HUB_USR}/jenkins-plugin-bug"
+    TAG = ":testcase1-${BUILD_NUMBER}"
+    IMAGELINE = "${REPOSITORY}${TAG} Dockerfile"
   }
   agent any
   stages {
@@ -21,7 +21,7 @@ pipeline {
     stage('Build image and push to registry') {
       steps {
         script {
-          dockerImage = docker.build repository + tag
+          dockerImage = docker.build REPOSITORY + TAG
           docker.withRegistry( '', registryCredential ) { 
             dockerImage.push() 
           }
@@ -30,13 +30,13 @@ pipeline {
     }
     stage('Analyze with Anchore plugin') {
       steps {
-        writeFile file: 'anchore_images', text: imageLine
+        writeFile file: 'anchore_images', text: IMAGELINE
         script {
           try {
             anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
           } catch (err) {
             // if scan fails, clean up (delete the image) and fail the build
-            sh 'docker rmi $repository$tag'
+            sh 'docker rmi ${REPOSITORY}${TAG}'
             sh 'exit 1'
           }
         }
@@ -56,7 +56,7 @@ pipeline {
     stage('Clean up') {
       // if we succuessfully pushed the :prod tag than we don't need the $BUILD_ID tag anymore
       steps {
-        sh 'docker rmi $repository$tag $repository:prod'
+        sh 'docker rmi ${REPOSITORY}${TAG} ${REPOSITORY}:prod'
       }
     }
   }
