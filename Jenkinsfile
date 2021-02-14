@@ -7,11 +7,9 @@ pipeline {
     // you need a credential named 'docker-hub' with your DockerID/password to push images
     registryCredential = 'docker-hub'
     // change this repository and imageLine to your DockerID
-    //repository = 'pvnovarese/jenkins-plugin-bug'
-    repository = "pvnovarese/anchore-jenkins-pipeline-demo"
-    //tag = ":testcase1-${BUILD_NUMBER}"
-    tag = ":testcase1-b49"
-    imageLine = "pvnovarese/anchore-jenkins-pipeline-demo:testcase1-b49 Dockerfile"
+    repository = 'pvnovarese/jenkins-plugin-bug'
+    tag = ":testcase1-${BUILD_NUMBER}"
+    imageLine = "pvnovarese/jenkins-plugin-bug:testcase1-${BUILD_NUMBER} Dockerfile"
   }
   agent any
   stages {
@@ -33,7 +31,10 @@ pipeline {
     stage('Analyze with Anchore plugin') {
       steps {
         writeFile file: 'anchore_images', text: imageLine
-        anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
+        catchError {
+          anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
+        }
+        sh 'docker rmi $repository$tag'
         // forceAnalyze is required since we're passing a Dockerfile with the image
       }
     }
