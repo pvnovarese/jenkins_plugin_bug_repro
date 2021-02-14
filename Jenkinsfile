@@ -8,8 +8,8 @@ pipeline {
     registryCredential = 'docker-hub'
     // change this repository and imageLine to your DockerID
     repository = 'pvnovarese/jenkins-plugin-bug'
-    tag = ":testcase1-${BUILD_NUMBER}"
-    imageLine = "pvnovarese/jenkins-plugin-bug:testcase1-${BUILD_NUMBER} Dockerfile"
+    tag = ":testcase1-b${BUILD_NUMBER}"
+    imageLine = "pvnovarese/jenkins-plugin-bug:testcase1-b${BUILD_NUMBER} Dockerfile"
   }
   agent any
   stages {
@@ -48,7 +48,7 @@ pipeline {
     stage('Clean up') {
       // if we succuessfully pushed the :prod tag than we don't need the $BUILD_ID tag anymore
       steps {
-        sh 'docker rmi $repository:testcase1-${BUILD_NUMBER}'
+        sh 'docker rmi $repository:testcase1-b${BUILD_NUMBER}'
       }
     }
   }
