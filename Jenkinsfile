@@ -2,11 +2,11 @@
 
 pipeline {
   environment {
-    // "registry" isn't required if we're using docker hub, I'm leaving it here in case you want to use a different registry
-    // registry = 'registry.hub.docker.com'
+    // "REGISTRY" isn't required if we're using docker hub, I'm leaving it here in case you want to use a different registry
+    // REGISTRY = 'registry.hub.docker.com'
     // you need a credential named 'docker-hub' with your DockerID/password to push images
-    registryCredential = "docker-hub"
-    DOCKER_HUB = credentials("$registryCredential")
+    CREDENTIAL = "docker-hub"
+    DOCKER_HUB = credentials("$CREDENTIAL")
     REPOSITORY = "${DOCKER_HUB_USR}/jenkins-plugin-bug"
     TAG = ":testcase1-${BUILD_NUMBER}"
     IMAGELINE = "${REPOSITORY}${TAG} Dockerfile"
@@ -22,7 +22,7 @@ pipeline {
       steps {
         script {
           dockerImage = docker.build REPOSITORY + TAG
-          docker.withRegistry( '', registryCredential ) { 
+          docker.withRegistry( '', CREDENTIAL ) { 
             dockerImage.push() 
           }
         }
@@ -46,7 +46,7 @@ pipeline {
     stage('Re-tag as prod and push stable image to registry') {
       steps {
         script {
-          docker.withRegistry('', registryCredential) {
+          docker.withRegistry('', CREDENTIAL) {
             dockerImage.push('prod') 
             // dockerImage.push takes the argument as a new tag for the image before pushing
           }
