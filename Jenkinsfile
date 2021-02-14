@@ -6,7 +6,7 @@ pipeline {
     // registry = 'registry.hub.docker.com'
     // you need a credential named 'docker-hub' with your DockerID/password to push images
     registryCredential = 'docker-hub'
-    DockerHub = credentials('docker-hub')
+    DockerHub = credentials('${registryCredential}')
     repository = "${DockerHub_USR}/jenkins-plugin-bug"
     tag = ":testcase1-${BUILD_NUMBER}"
     imageLine = "${repository}${tag} Dockerfile"
