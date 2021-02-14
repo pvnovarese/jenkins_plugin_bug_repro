@@ -9,7 +9,7 @@ pipeline {
     DockerHub = credentials('docker-hub')
     repository = "${DockerHub_USR}/jenkins-plugin-bug"
     tag = ":testcase1-${BUILD_NUMBER}"
-    imageLine = "${repository}:testcase1-${BUILD_NUMBER} Dockerfile"
+    imageLine = "${repository}${tag} Dockerfile"
   }
   agent any
   stages {
