@@ -36,7 +36,7 @@ pipeline {
             anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
           } catch (err) {
             sh 'docker rmi $repository$tag'
-            currentBuild.result = 'FAILURE'
+            sh 'exit 1'
           }
         }
         // forceAnalyze is required since we're passing a Dockerfile with the image
